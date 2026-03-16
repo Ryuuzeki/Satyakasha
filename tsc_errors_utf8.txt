@@ -1,0 +1,119 @@
+﻿src/application/usecases/RegisterDocumentUseCase.ts(23,23): error TS2304: Cannot find name 'crypto'.
+src/domain/entities/Document.ts(28,11): error TS2304: Cannot find name 'crypto'.
+src/infrastructure/security/EncryptionService.ts(23,27): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(algorithm: CipherGCMTypes, key: CipherKey, iv: BinaryLike, options?: CipherGCMOptions | undefined): CipherGCM', gave the following error.
+    Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'CipherKey'.
+      Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike> | KeyObject'.
+        Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+          The types of 'slice(...).buffer' are incompatible between these types.
+            Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+              Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+                Types of property '[Symbol.toStringTag]' are incompatible.
+                  Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+  Overload 2 of 5, '(algorithm: "chacha20-poly1305", key: CipherKey, iv: BinaryLike, options?: CipherChaCha20Poly1305Options | undefined): CipherChaCha20Poly1305', gave the following error.
+    Argument of type '"aes-256-gcm"' is not assignable to parameter of type '"chacha20-poly1305"'.
+  Overload 3 of 5, '(algorithm: string, key: CipherKey, iv: BinaryLike | null, options?: TransformOptions<Transform> | undefined): Cipher', gave the following error.
+    Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'CipherKey'.
+      Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike> | KeyObject'.
+        Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+          The types of 'slice(...).buffer' are incompatible between these types.
+            Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+              Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+                Types of property '[Symbol.toStringTag]' are incompatible.
+                  Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(26,38): error TS2322: Type 'Buffer<ArrayBufferLike> & string' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(26,52): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'BinaryLike'.
+  Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike>'.
+    Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+      The types of 'slice(...).buffer' are incompatible between these types.
+        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+          Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+            Types of property '[Symbol.toStringTag]' are incompatible.
+              Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(26,60): error TS2322: Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(30,27): error TS2322: Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(30,31): error TS2322: Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(30,40): error TS2322: Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(45,29): error TS2769: No overload matches this call.
+  Overload 1 of 5, '(algorithm: CipherGCMTypes, key: CipherKey, iv: BinaryLike, options?: CipherGCMOptions | undefined): DecipherGCM', gave the following error.
+    Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'CipherKey'.
+      Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike> | KeyObject'.
+        Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+          The types of 'slice(...).buffer' are incompatible between these types.
+            Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+              Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+                Types of property '[Symbol.toStringTag]' are incompatible.
+                  Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+  Overload 2 of 5, '(algorithm: "chacha20-poly1305", key: CipherKey, iv: BinaryLike, options?: CipherChaCha20Poly1305Options | undefined): DecipherChaCha20Poly1305', gave the following error.
+    Argument of type '"aes-256-gcm"' is not assignable to parameter of type '"chacha20-poly1305"'.
+  Overload 3 of 5, '(algorithm: string, key: CipherKey, iv: BinaryLike | null, options?: TransformOptions<Transform> | undefined): Decipher', gave the following error.
+    Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'CipherKey'.
+      Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike> | KeyObject'.
+        Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+          The types of 'slice(...).buffer' are incompatible between these types.
+            Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+              Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+                Types of property '[Symbol.toStringTag]' are incompatible.
+                  Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(46,25): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'ArrayBufferView<ArrayBufferLike>'.
+  Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike>'.
+    Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+      The types of 'slice(...).buffer' are incompatible between these types.
+        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+          Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+            Types of property '[Symbol.toStringTag]' are incompatible.
+              Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(48,27): error TS2322: Type 'Buffer<ArrayBufferLike> & string' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(48,43): error TS2345: Argument of type 'Buffer<ArrayBufferLike>' is not assignable to parameter of type 'ArrayBufferView<ArrayBufferLike>'.
+  Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike> | DataView<ArrayBufferLike>'.
+    Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+      The types of 'slice(...).buffer' are incompatible between these types.
+        Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+          Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+            Types of property '[Symbol.toStringTag]' are incompatible.
+              Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/security/EncryptionService.ts(48,55): error TS2322: Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+  The types of 'slice(...).buffer' are incompatible between these types.
+    Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+      Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+        Types of property '[Symbol.toStringTag]' are incompatible.
+          Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.
+src/infrastructure/storage/IPFSStorageService.ts(55,16): error TS2416: Property 'retrieve' in type 'IPFSStorageService' is not assignable to the same property in base type 'IStorageService'.
+  Type '(cid: string) => Promise<Buffer<ArrayBufferLike>>' is not assignable to type '(cid: string) => Promise<Uint8Array<ArrayBufferLike>>'.
+    Type 'Promise<Buffer<ArrayBufferLike>>' is not assignable to type 'Promise<Uint8Array<ArrayBufferLike>>'.
+      Type 'Buffer<ArrayBufferLike>' is not assignable to type 'Uint8Array<ArrayBufferLike>'.
+        The types of 'slice(...).buffer' are incompatible between these types.
+          Type 'ArrayBufferLike' is not assignable to type 'ArrayBuffer'.
+            Type 'SharedArrayBuffer' is not assignable to type 'ArrayBuffer'.
+              Types of property '[Symbol.toStringTag]' are incompatible.
+                Type '"SharedArrayBuffer"' is not assignable to type '"ArrayBuffer"'.

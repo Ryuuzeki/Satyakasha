@@ -1,0 +1,5 @@
+export enum DocumentStatus {
+  PENDING_VALIDATION = 'PENDING_VALIDATION',
+  VERIFIED = 'VERIFIED',
+  REVOKED = 'REVOKED'
+}
