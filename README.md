@@ -60,4 +60,9 @@ Hanya KAP atau Bank terdaftar yang diizinkan merilis klaim ke *Blockchain*, buka
 
 ---
 
+## 🔗 Links & Repository
+
+* **GitHub Repository**: [https://github.com/Ryuuzeki/Satyakasha](https://github.com/Ryuuzeki/Satyakasha)
+* **Status**: Development & Testing (Lisk Sepolia Testnet)
+
 *Terus di-Update secara konsisten sesuai filosofi Agile Documentation.*
