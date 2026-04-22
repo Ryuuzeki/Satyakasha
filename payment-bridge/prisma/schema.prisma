@@ -1,0 +1,115 @@
+// =============================================================================
+// Satyakasha Payment Bridge — Database Schema
+// =============================================================================
+// This schema tracks the full lifecycle of a fiat-to-blockchain transaction.
+// The orderId field serves as the idempotency key to prevent double spending.
+// =============================================================================
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+/// Transaction status state machine:
+/// PENDING → PAID_FIAT → BLOCKCHAIN_PROCESSING → SUCCESS
+///                    ↘ FAILED (unrecoverable)    ↗ FAILED
+enum TransactionStatus {
+  PENDING                // Created, awaiting Midtrans payment confirmation
+  PAID_FIAT              // Midtrans confirmed payment received (settlement/capture)
+  BLOCKCHAIN_PROCESSING  // Blockchain tx submitted, waiting for on-chain confirmation
+  SUCCESS                // Blockchain tx confirmed — document registered on Lisk
+  FAILED                 // Unrecoverable failure after max retries
+}
+
+/// Core transaction table — one row per payment-to-blockchain bridge operation
+model Transaction {
+  id        String @id @default(cuid())
+
+  /// External Order ID — the idempotency key.
+  /// Midtrans uses this as the order_id. Must be globally unique.
+  /// Duplicate webhooks with the same orderId are safely ignored.
+  orderId   String @unique @map("order_id")
+
+  /// Current status in the state machine
+  status    TransactionStatus @default(PENDING)
+
+  // ---------------------------------------------------------------------------
+  // Fiat Payment Fields (populated by Midtrans webhook)
+  // ---------------------------------------------------------------------------
+
+  /// Total amount in IDR (e.g., 50000.00)
+  grossAmount   Decimal    @map("gross_amount")
+
+  /// Payment method used (e.g., "bank_transfer", "gopay", "credit_card")
+  paymentType   String?    @map("payment_type")
+
+  /// Raw Midtrans transaction status string (e.g., "settlement", "capture")
+  midtransStatus String?   @map("midtrans_status")
+
+  // ---------------------------------------------------------------------------
+  // Document Fields (passed during payment creation, used for blockchain call)
+  // ---------------------------------------------------------------------------
+
+  /// SHA-256 hash of the document being registered
+  documentHash    String   @map("document_hash")
+
+  /// IPFS Content Identifier of the encrypted document
+  ipfsCid         String   @map("ipfs_cid")
+
+  /// Name of the registering institution (e.g., "Bank BCA")
+  institutionName String   @map("institution_name")
+
+  /// Name of the document recipient/client
+  recipientName   String   @map("recipient_name")
+
+  // ---------------------------------------------------------------------------
+  // Blockchain Fields (populated after on-chain execution)
+  // ---------------------------------------------------------------------------
+
+  /// On-chain transaction hash (e.g., "0xabc123...")
+  txHash      String?  @map("tx_hash")
+
+  /// Block number where the transaction was confirmed
+  blockNumber Int?     @map("block_number")
+
+  /// Number of retry attempts for blockchain execution
+  retryCount  Int      @default(0) @map("retry_count")
+
+  /// Last error message if blockchain execution failed
+  lastError   String?  @map("last_error") @db.Text
+
+  // ---------------------------------------------------------------------------
+  // Timestamps
+  // ---------------------------------------------------------------------------
+
+  /// When Midtrans confirmed the fiat payment
+  paidAt      DateTime?  @map("paid_at")
+
+  /// When the blockchain transaction was first submitted
+  processedAt DateTime?  @map("processed_at")
+
+  /// When the blockchain transaction was confirmed (SUCCESS)
+  completedAt DateTime?  @map("completed_at")
+
+  /// Row creation timestamp
+  createdAt   DateTime   @default(now()) @map("created_at")
+
+  /// Last update timestamp (auto-managed by Prisma)
+  updatedAt   DateTime   @updatedAt @map("updated_at")
+
+  // ---------------------------------------------------------------------------
+  // Indexes for performance
+  // ---------------------------------------------------------------------------
+
+  /// Fast lookup by status (webhook handler, reconciliation)
+  @@index([status])
+
+  /// Composite index for reconciliation query: "WHERE status IN (...) AND updated_at < ?"
+  @@index([status, updatedAt])
+
+  @@map("transactions")
+}
