@@ -27,12 +27,12 @@ export async function POST(req: NextRequest) {
     const parameters = {
       transaction_details: {
         order_id: orderId,
-        gross_amount: 15000, 
+        gross_amount: 1000, 
       },
       item_details: [
         {
           id: "DOC_VERIFICATION",
-          price: 15000,
+          price: 1000,
           quantity: 1,
           name: "Satyakasha Financial Document Audit",
           category: "Audit & Ledger",
