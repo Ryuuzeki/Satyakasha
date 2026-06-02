@@ -283,8 +283,8 @@ export function Hero() {
                 <h3 className="text-lg font-bold text-amber-400">Pro</h3>
                 <p className="text-xs text-slate-400 mt-1">Dirancang untuk Kantor Akuntan & Lembaga Keuangan</p>
                 <div className="mt-4 flex items-baseline">
-                  <span className="text-4xl font-extrabold text-white">Rp 2.9M</span>
-                  <span className="text-sm text-slate-400 ml-1">/ tahun</span>
+                  <span className="text-4xl font-extrabold text-white">Rp 0</span>
+                  <span className="text-sm text-slate-400 ml-1">/ selama beta</span>
                 </div>
                 <ul className="mt-6 space-y-3.5">
                   <li className="flex items-center gap-2.5 text-xs text-slate-300">
