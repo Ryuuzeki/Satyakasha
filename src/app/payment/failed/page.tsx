@@ -1,7 +1,7 @@
 export const dynamic = "force-dynamic";
 
-import UnfinishClient from "./client";
+import FailedClient from "./client";
 
 export default function Page() {
-  return <UnfinishClient />;
+  return <FailedClient />;
 }
