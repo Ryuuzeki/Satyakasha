@@ -1,0 +1,7 @@
+.venv
+.next
+node_modules
+.git
+.vscode
+.vercel
+*.tsbuildinfo

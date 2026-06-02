@@ -1,0 +1,54 @@
+Product Requirements Document (PRD): Arsitektur RAG & Orkestrasi LangChain (Satyakasha AI)
+
+
+1. Cakupan & Relevansi Integrasi
+________________
+Modul RAG dan LangChain ditambahkan ke dalam ekosistem AI DuplicateGuard untuk mengatasi batasan inheren Large Language Model (LLM), yaitu kecenderungan berhalusinasi pada angka, ketidakmampuan melakukan operasi matematika presisi tinggi, dan ketiadaan konteks terhadap basis data spesifik klien. Dengan RAG, AI tidak sekadar menebak, melainkan menarik referensi data historis (faktur terdahulu, SOP perusahaan, dan harga pasar) sebagai landasan logika sebelum mengeluarkan skor validasi.
+
+
+2. Spesifikasi Fitur Utama
+________________
+2.1. Context-Aware Retrieval & Hybrid Search
+* Pencarian Harga Historis (Market Price Oracle): Sistem melakukan pencarian Hybrid (kombinasi Semantic Vector Search dan Exact/Keyword Match) terhadap arsip Purchase Order (PO) dan faktur klien sebelumnya. Vector search menangkap kemiripan deskripsi barang, sementara Keyword match memastikan keakuratan filter angka/Vendor ID. Fitur ini krusial untuk mendeteksi over-invoicing.
+* Injeksi Aturan Kepatuhan (SOP Compliance): Memasukkan dokumen pedoman pengadaan korporasi ke dalam basis data vektor. Saat mengevaluasi faktur, AI akan menarik aturan spesifik klien sebagai variabel penentu Fraud Score.
+
+2.2. Deterministic Math Validation
+* Validasi Kalkulasi Terpisah: Untuk mencegah latency overhead dari penalaran Agentic yang berulang, kalkulasi matematika tidak lagi diserahkan kepada keputusan LLM. Sebaliknya, parser mengekstrak daftar item (Kuantitas, Harga Satuan, Total), lalu sebuah script Python deterministik akan memverifikasi keakuratan perhitungan secara absolut di latar belakang. Hasil perhitungan ini disuntikkan sebagai konteks pasti.
+
+2.3. Pipeline Orkestrasi Otomatis (Sequential Chaining)
+* Otomatisasi Alur Validasi: Menggunakan LangChain untuk merangkai seluruh fungsi menjadi satu kesatuan alur (chain) yang dieksekusi secara berurutan:
+
+Trigger API ➔ EasyOCR Extraction ➔ Query Formulation (Ekstraksi Entitas) ➔ Hybrid Retrieval (pgvector + Keyword) ➔ Deterministic Math Validation ➔ LLM Prompting (Konteks + Data + Hasil Math) ➔ Structured JSON Output
+
+
+3. Arsitektur Aliran Data (Data Flow)
+________________
+   1. Ingestion & Embedding: 
+      - Data historis klien diproses menggunakan Layout-Aware Document Parsing (misal: Unstructured) untuk menjaga kelengkapan struktur tabel.
+      - Data diformat menjadi Line-Item Chunking (setiap baris barang adalah satu dokumen/chunk).
+      - Data diubah menjadi vektor dan disimpan di Vector Database beserta metadata-nya.
+   2. Query Extraction & Formulation: Faktur baru diproses oleh EasyOCR. Karena teks OCR mentah sering berantakan, sistem akan mengekstrak entitas kunci (Nama Barang, Vendor) untuk dirumuskan menjadi query pencarian terstruktur.
+   3. Hybrid Retrieval: Sistem mencari 5 dokumen historis paling relevan di Vector Database (Top-K) berdasarkan pencarian Vektor (semantik) dan Metadata/Keyword (eksak).
+   4. Deterministic Pre-processing: Script matematika berjalan untuk memvalidasi perkalian dan penjumlahan total faktur.
+   5. Augmented Generation: Teks faktur, hasil perhitungan matematis (Valid/Invalid), dan data referensi historis disuntikkan ke dalam prompt LLM.
+   6. Output Parsing: LangChain memaksa LLM untuk memformat hasil analisis ke dalam format JSON yang baku agar siap dikonsumsi backend Next.js instan.
+
+
+4. Tumpukan Teknologi (Tech Stack) Khusus RAG
+________________
+
+Komponen Sistem | Teknologi Terpilih | Deskripsi Operasional
+--- | --- | ---
+Orkestrator Utama | LangChain | Mengatur sequential chaining, prompt management, dan output parser.
+Vector Database | pgvector (PostgreSQL) | Memanfaatkan ekstensi pgvector (dengan indexing HNSW untuk pencarian <500ms) dan Full-Text Search untuk kapabilitas Hybrid Search.
+Embedding Model | BGE-m3 (BAAI) / Local | Model embedding ringan dan open-source yang unggul dalam representasi bahasa Indonesia.
+Document Parser | Unstructured / LLM Vision | Mempertahankan format tabular saat chunking data finansial ke database.
+LLM Core | Mistral / Llama 3 (Lokal) via vLLM/Ollama | Dijalankan sebagai inferensi dasar dengan framework PagedAttention untuk latensi rendah. Menerima konteks RAG untuk menghasilkan Fraud Score.
+
+
+5. Metrik Keberhasilan & KPI Khusus Modul RAG
+________________
+   * Akurasi Kalkulasi Finansial: Harus mencapai 100% mutlak berkat Deterministic Math Tool, sehingga tingkat halusinasi LLM pada angka ditekan hingga 0%.
+   * Latensi Retrieval: Proses pencarian Hybrid di pgvector (dengan index HNSW) harus dieksekusi di bawah 500 milidetik (0.5 detik).
+   * Context Relevance Score: Tingkat relevansi dokumen referensi yang ditarik oleh sistem RAG ditargetkan memiliki metrik presisi di atas 90% (dibantu dengan ekstraksi entitas awal dan metode line-item chunking).
+   * Total Latency: Total proses Three-Way Matching harus lebih terkontrol (mengindari ping-pong tools) melalui Sequential Chaining yang efisien.

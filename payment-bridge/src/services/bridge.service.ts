@@ -6,6 +6,7 @@ import { ethers } from 'ethers';
 import { prisma } from '../lib/prisma.js';
 import {
   registryContract,
+  buybackContract,
   provider,
   relayerWallet,
   getDynamicGasOverrides,
@@ -163,4 +164,50 @@ function calculateBackoffDelay(attempt: number, config: RetryConfig): number {
   const exponentialDelay = config.baseDelayMs * Math.pow(2, attempt);
   const jitter = Math.random() * config.baseDelayMs * 0.5;
   return Math.min(exponentialDelay + jitter, config.maxDelayMs);
+}
+
+/**
+ * Triggers the Circular Economy (Token Buyback) on the smart contract.
+ * Converts Fiat revenue into DePIN node incentives.
+ */
+export async function executeBuybackTx(fiatAmountRupiah: number): Promise<void> {
+  const log = bridgeLogger.child({ feature: 'Buyback', fiatAmountRupiah });
+  
+  if (buybackContract.target === '0x0000000000000000000000000000000000000000') {
+    log.info('Mock Buyback Triggered: BUYBACK_CONTRACT_ADDRESS is not set. Simulating DePIN token distribution offline.');
+    return;
+  }
+
+  try {
+    log.info('Triggering DePIN Tokenomics Buyback mechanism...');
+    
+    // Hardcoded dummy active DePIN node addresses for hackathon simulation
+    const activeNodes = [
+      '0x1234567890123456789012345678901234567890',
+      '0xabcdefabcdefabcdefabcdefabcdefabcdefabcd'
+    ];
+
+    const fn = buybackContract.getFunction('recordFiatAndDistributeTokens');
+    
+    // Estimate Gas & Overrides
+    const estimatedGas = await fn.estimateGas(fiatAmountRupiah, activeNodes);
+    const gasOverrides = await getDynamicGasOverrides(estimatedGas);
+    const nonce = await provider.getTransactionCount(relayerWallet.address, 'pending');
+
+    const txResponse = await fn(fiatAmountRupiah, activeNodes, {
+      maxFeePerGas: gasOverrides.maxFeePerGas,
+      maxPriorityFeePerGas: gasOverrides.maxPriorityFeePerGas,
+      gasLimit: gasOverrides.gasLimit,
+      nonce,
+    });
+
+    log.info({ txHash: txResponse.hash }, '💸 Buyback TX Submitted! Waiting for confirmation...');
+    
+    const receipt = await txResponse.wait(1);
+    if (receipt && receipt.status === 1) {
+      log.info('♻️ Circular Economy Complete: Tokens distributed to DePIN nodes!');
+    }
+  } catch (error: any) {
+    log.error({ error: error.message }, 'Failed to execute Buyback Tokenomics');
+  }
 }

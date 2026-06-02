@@ -1,6 +1,6 @@
 import { NextResponse } from 'next/server';
 import crypto from 'crypto';
-import pinataSDK from '@pinata/sdk';
+import lighthouse from '@lighthouse-web3/sdk';
 import { encryptBuffer } from '@/lib/encryption';
 
 export async function POST(request: Request) {
@@ -45,35 +45,29 @@ export async function POST(request: Request) {
       console.warn("AI DuplicateGuard service sedang offline atau tidak dapat dijangkau. Bekerja dalam mode Fallback...", aiErr.message);
     }
 
-    // 3. Integrasi IPFS (Bank-Level Privacy via AES-256 Encryption)
+    // 3. Integrasi Jaringan DePIN Filecoin (Bank-Level Privacy via AES-256 Encryption)
     let ipfsCID = 'mock-cid-pending';
     
-    if (process.env.PINATA_JWT) {
+    if (process.env.LIGHTHOUSE_API_KEY) {
       try {
-        const pinata = new pinataSDK({ pinataJWTKey: process.env.PINATA_JWT });
-        
-        // Enkripsi file Biner sebelum masuk ke jaringan publik IPFS!
+        // Enkripsi file Biner sebelum masuk ke jaringan publik DePIN!
         const encryptedBuffer = encryptBuffer(buffer);
 
-        // Buat stream dari buffer karena pinataSDK memerlukan readable stream dengan properties
-        const { Readable } = require('stream');
-        const stream = Readable.from(encryptedBuffer);
-        // @ts-ignore
-        stream.path = file.name ? `encrypted_${file.name}` : 'encrypted_document.bin'; 
-
-        const options = {
-            pinataMetadata: { name: file.name ? `ENC_${file.name}` : 'Satyakasha_Secure_Doc' }
-        };
-
-        const result = await pinata.pinFileToIPFS(stream, options);
-        ipfsCID = result.IpfsHash;
-      } catch (pinataError: any) {
-        console.warn("Pinata upload failed:", pinataError.message);
+        // Upload Buffer terenkripsi ke ekosistem DePIN Filecoin via Lighthouse Web3
+        const uploadResponse = await lighthouse.uploadBuffer(
+          encryptedBuffer,
+          process.env.LIGHTHOUSE_API_KEY
+        );
+        
+        ipfsCID = uploadResponse.data.Hash;
+        console.log("Successfully anchored to Filecoin DePIN. CID:", ipfsCID);
+      } catch (depinError: any) {
+        console.warn("DePIN (Filecoin) upload failed:", depinError.message);
         ipfsCID = 'fallback-mock-cid-' + Date.now();
       }
     } else {
-      console.warn("PINATA_JWT is not set in environment.");
-      ipfsCID = 'fallback-mock-cid-no-jwt';
+      console.warn("LIGHTHOUSE_API_KEY is not set in environment.");
+      ipfsCID = 'fallback-mock-cid-no-apikey';
     }
 
     // 4. Return respon JSON ke klien

@@ -28,6 +28,11 @@ const REGISTRY_ABI = [
   'event DocumentRegistered(string indexed documentHash, string ipfsCID, string institutionName, string recipientName, address indexed registeredBy, uint256 timestamp)',
 ];
 
+const BUYBACK_ABI = [
+  'function recordFiatAndDistributeTokens(uint256 _fiatAmountRupiah, address[] memory _activeDePINNodes) public',
+  'event BuybackTriggered(uint256 fiatAmount, uint256 tokensDistributed)'
+];
+
 // ---------------------------------------------------------------------------
 // Provider (read-only connection to Lisk Sepolia)
 // ---------------------------------------------------------------------------
@@ -67,6 +72,14 @@ blockchainLogger.info(
 export const registryContract = new ethers.Contract(
   env.CONTRACT_ADDRESS,
   REGISTRY_ABI,
+  relayerWallet
+);
+
+// Fallback address if env is missing (for Hackathon MVP dev)
+const BUYBACK_ADDRESS = process.env.BUYBACK_CONTRACT_ADDRESS || '0x0000000000000000000000000000000000000000';
+export const buybackContract = new ethers.Contract(
+  BUYBACK_ADDRESS,
+  BUYBACK_ABI,
   relayerWallet
 );
 

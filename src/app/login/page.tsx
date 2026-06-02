@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Shield } from 'lucide-react';
 
 // Hardcoded MVP Access Codes (Financial Context)
 const VALID_INSTITUTIONS: Record<string, string> = {
@@ -49,10 +48,8 @@ export default function LoginPage() {
         animate={{ opacity: 1, y: 0 }}
         className="max-w-md w-full bg-white p-8 rounded-2xl shadow-sm border border-slate-100"
       >
-        <div className="flex justify-center mb-6">
-          <div className="w-16 h-16 bg-blue-100 rounded-2xl flex items-center justify-center text-blue-600">
-            <Shield className="w-8 h-8" />
-          </div>
+        <div className="flex flex-col items-center mb-8">
+          <img src="/logo-full.png" alt="Satyakasha Logo" className="h-24 w-auto mb-2" />
         </div>
         
         <h1 className="text-2xl font-bold text-slate-900 text-center mb-2">Portal Audit Finansial</h1>

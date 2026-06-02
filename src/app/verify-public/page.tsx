@@ -22,19 +22,11 @@ export default function VerifyPublicPage() {
     setError('');
     
     try {
-      // 1. Dapatkan Hash dari Server
-      const formData = new FormData();
-      formData.append('file', selectedFile);
-
-      const res = await fetch('/api/public/hash', {
-        method: 'POST',
-        body: formData,
-      });
-
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Gagal menghitung hash');
-      
-      const docHash = data.documentHash;
+      // 1. Dapatkan Hash secara Lokal di Browser (Zero-Knowledge)
+      const arrayBuffer = await selectedFile.arrayBuffer();
+      const hashBuffer = await crypto.subtle.digest('SHA-256', arrayBuffer);
+      const hashArray = Array.from(new Uint8Array(hashBuffer));
+      const docHash = hashArray.map(b => b.toString(16).padStart(2, '0')).join('');
 
       const contractAddress = process.env.NEXT_PUBLIC_CONTRACT_ADDRESS as `0x${string}`;
       const isZeroAddress = !contractAddress || contractAddress === '0x0000000000000000000000000000000000000000';
