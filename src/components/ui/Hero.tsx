@@ -394,7 +394,7 @@ export function Hero() {
                   </div>
                   <div>
                     <p className="text-xs text-slate-400 font-bold uppercase">Kantor Pusat</p>
-                    <span className="text-slate-900 font-semibold">Gedung Web3 Center Lt.12, Sudirman, Jakarta</span>
+                    <span className="text-slate-900 font-semibold">-</span>
                   </div>
                 </div>
               </div>
@@ -445,7 +445,7 @@ export function Hero() {
       {/* Footer */}
       <footer className="py-8 bg-slate-900 border-t border-slate-800 text-center text-sm text-slate-400">
         <div className="max-w-7xl mx-auto px-4">
-          <p>© 2026 Satyakasha. Dilindungi Undang-Undang. Menggunakan Jaringan Lisk L2 Blockchain & IPFS.</p>
+          <p>@Satyakasha</p>
         </div>
       </footer>
     </div>

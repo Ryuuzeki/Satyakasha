@@ -26,6 +26,7 @@ const securityHeaders = [
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.18.18", "localhost", "127.0.0.1"],
+  serverExternalPackages: ["bls-eth-wasm"],
   async headers() {
     return [
       {
