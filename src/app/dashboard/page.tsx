@@ -24,6 +24,10 @@ export default function Dashboard() {
     fetch('/api/auth/me')
       .then(res => {
         if (!res.ok) throw new Error('Not authenticated');
+        const contentType = res.headers.get("content-type");
+        if (!contentType || !contentType.includes("application/json")) {
+          throw new Error('Server returned non-JSON response for auth');
+        }
         return res.json();
       })
       .then(data => {
@@ -87,6 +91,13 @@ export default function Dashboard() {
           recipientName: recipientName
         })
       });
+
+      const checkoutContentType = checkoutRes.headers.get("content-type");
+      if (!checkoutContentType || !checkoutContentType.includes("application/json")) {
+        const checkoutTextError = await checkoutRes.text();
+        console.error("Non-JSON response from /api/checkout:", checkoutTextError);
+        throw new Error(`Checkout Error (${checkoutRes.status}): Terjadi kesalahan tak terduga pada server pembayaran.`);
+      }
 
       const checkoutData = await checkoutRes.json();
       if (!checkoutRes.ok) throw new Error(checkoutData.error || 'Gagal memulai checkout');
