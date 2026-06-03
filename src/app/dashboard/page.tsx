@@ -61,6 +61,13 @@ export default function Dashboard() {
         body: formData,
       });
 
+      const contentType = res.headers.get("content-type");
+      if (!contentType || !contentType.includes("application/json")) {
+        const textData = await res.text();
+        console.error("Server returned non-JSON response:", textData);
+        throw new Error(`Server Error (${res.status}): Terjadi kesalahan atau ukuran file terlalu besar.`);
+      }
+
       const data = await res.json();
       
       if (!res.ok) throw new Error(data.error || 'Verifikasi Gagal');

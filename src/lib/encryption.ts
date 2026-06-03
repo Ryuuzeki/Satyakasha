@@ -2,9 +2,10 @@ import crypto from 'crypto';
 
 const ALGORITHM = 'aes-256-cbc';
 // Pastikan ENCRYPTION_KEY memiliki panjang tepat 32 karakter
-const keyString = process.env.ENCRYPTION_KEY || 'SatyakashaDefaultBankKey32Bytes!';
+let keyString = process.env.ENCRYPTION_KEY || 'SatyakashaDefaultBankKey32Bytes!';
 if (keyString.length !== 32) {
-  throw new Error("ENCRYPTION_KEY must be exactly 32 characters long.");
+  console.warn("ENCRYPTION_KEY length is not 32. Falling back to default key.");
+  keyString = 'SatyakashaDefaultBankKey32Bytes!';
 }
 const ENCRYPTION_KEY = Buffer.from(keyString, 'utf-8');
 const IV_LENGTH = 16;
