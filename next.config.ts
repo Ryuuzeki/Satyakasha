@@ -19,14 +19,14 @@ const securityHeaders = [
   },
   {
     key: 'Content-Security-Policy',
-    // Mengizinkan Midtrans scripts & frames. Mengizinkan blob/data URLs untuk gambar IPFS preview.
-    value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline' https://app.sandbox.midtrans.com https://app.midtrans.com; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' https: wss:; frame-src 'self' https://app.sandbox.midtrans.com https://app.midtrans.com;",
+    // Mengizinkan WalletConnect & blob/data URLs untuk gambar IPFS preview.
+    value: "default-src 'self'; script-src 'self' 'unsafe-eval' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' blob: data: https:; connect-src 'self' https: wss: https://pulse.walletconnect.org https://api.web3modal.org wss://relay.walletconnect.org wss://relay.walletconnect.com; frame-src 'self';",
   }
 ];
 
 const nextConfig: NextConfig = {
   allowedDevOrigins: ["192.168.18.18", "localhost", "127.0.0.1"],
-  serverExternalPackages: ["bls-eth-wasm"],
+
   async headers() {
     return [
       {

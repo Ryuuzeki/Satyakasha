@@ -3,8 +3,25 @@
 import { UploadCloud } from 'lucide-react';
 import { useState, useCallback } from 'react';
 
-export function FileUpload({ onFileSelect }: { onFileSelect: (file: File) => void }) {
+type FileUploadProps = {
+  onFileSelect: (file: File) => void;
+  maxSizeMb?: number;
+};
+
+export function FileUpload({ onFileSelect, maxSizeMb = 10 }: FileUploadProps) {
   const [isDrag, setIsDrag] = useState(false);
+  const maxSizeBytes = maxSizeMb * 1024 * 1024;
+
+  const selectFile = useCallback((file: File) => {
+    if (file.size > maxSizeBytes) {
+      alert(
+        `Ukuran file terlalu besar (${(file.size / 1024 / 1024).toFixed(1)}MB). Maksimal ${maxSizeMb}MB.`,
+      );
+      return;
+    }
+
+    onFileSelect(file);
+  }, [maxSizeBytes, maxSizeMb, onFileSelect]);
 
   const handleDrag = useCallback((e: React.DragEvent) => {
     e.preventDefault();
@@ -18,13 +35,14 @@ export function FileUpload({ onFileSelect }: { onFileSelect: (file: File) => voi
     e.stopPropagation();
     setIsDrag(false);
     if (e.dataTransfer.files && e.dataTransfer.files[0]) {
-      onFileSelect(e.dataTransfer.files[0]);
+      selectFile(e.dataTransfer.files[0]);
     }
-  }, [onFileSelect]);
+  }, [selectFile]);
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
-      onFileSelect(e.target.files[0]);
+      selectFile(e.target.files[0]);
+      e.target.value = '';
     }
   };
 
@@ -45,7 +63,7 @@ export function FileUpload({ onFileSelect }: { onFileSelect: (file: File) => voi
           Tarik & Lepas Dokumen di Sini
         </p>
         <p className="text-sm text-slate-500 mt-2">atau klik untuk menelusuri folder Anda</p>
-        <p className="text-xs text-slate-400 mt-4">Mendukung PDF, JPG, PNG (Maks. 10MB)</p>
+        <p className="text-xs text-slate-400 mt-4">Mendukung PDF, JPG, PNG (Maks. {maxSizeMb}MB)</p>
       </label>
     </div>
   );

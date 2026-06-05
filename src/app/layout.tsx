@@ -1,7 +1,6 @@
 import "@/lib/mockStorage";
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
-import Script from "next/script";
 import "./globals.css";
 import { Providers } from "@/components/providers";
 
@@ -31,13 +30,9 @@ export default function RootLayout({
       className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}
     >
       <body className="min-h-full flex flex-col bg-slate-50 text-slate-900">
-        <Script 
-          src="https://app.sandbox.midtrans.com/snap/snap.js" 
-          strategy="beforeInteractive"
-          data-client-key={process.env.MIDTRANS_CLIENT_KEY}
-        />
         <Providers>{children}</Providers>
       </body>
     </html>
   );
 }
+

@@ -3,6 +3,21 @@ import crypto from 'crypto';
 import lighthouse from '@lighthouse-web3/sdk';
 import { encryptBuffer } from '@/lib/encryption';
 
+export const runtime = 'nodejs';
+
+const MAX_UPLOAD_SIZE_MB = 4;
+const MAX_UPLOAD_SIZE_BYTES = MAX_UPLOAD_SIZE_MB * 1024 * 1024;
+
+type DuplicateCheckResult = {
+  isDuplicate?: boolean;
+  confidenceScore?: number | string;
+  details?: unknown;
+};
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -10,6 +25,15 @@ export async function POST(request: Request) {
 
     if (!file) {
       return NextResponse.json({ error: 'No file received.' }, { status: 400 });
+    }
+
+    if (file.size > MAX_UPLOAD_SIZE_BYTES) {
+      return NextResponse.json(
+        {
+          error: `Ukuran file terlalu besar. Maksimal ${MAX_UPLOAD_SIZE_MB}MB untuk upload dashboard.`,
+        },
+        { status: 413 },
+      );
     }
 
     const buffer = Buffer.from(await file.arrayBuffer());
@@ -29,7 +53,7 @@ export async function POST(request: Request) {
       });
       
       if (aiResponse.ok) {
-        const aiResult = await aiResponse.json();
+        const aiResult = await aiResponse.json() as DuplicateCheckResult;
         
         // Blokir jika terdeteksi duplikat (Skor kemiripan yang tinggi via Computer Vision/NLP)
         if (aiResult.isDuplicate) {
@@ -41,8 +65,8 @@ export async function POST(request: Request) {
       } else {
         console.warn("Layanan AI merespons dengan error:", await aiResponse.text());
       }
-    } catch (aiErr: any) {
-      console.warn("AI DuplicateGuard service sedang offline atau tidak dapat dijangkau. Bekerja dalam mode Fallback...", aiErr.message);
+    } catch (aiErr: unknown) {
+      console.warn("AI DuplicateGuard service sedang offline atau tidak dapat dijangkau. Bekerja dalam mode Fallback...", getErrorMessage(aiErr));
     }
 
     // 3. Integrasi Jaringan DePIN Filecoin (Bank-Level Privacy via AES-256 Encryption)
@@ -61,8 +85,8 @@ export async function POST(request: Request) {
         
         ipfsCID = uploadResponse.data.Hash;
         console.log("Successfully anchored to Filecoin DePIN. CID:", ipfsCID);
-      } catch (depinError: any) {
-        console.warn("DePIN (Filecoin) upload failed:", depinError.message);
+      } catch (depinError: unknown) {
+        console.warn("DePIN (Filecoin) upload failed:", getErrorMessage(depinError));
         ipfsCID = 'fallback-mock-cid-' + Date.now();
       }
     } else {
@@ -76,8 +100,8 @@ export async function POST(request: Request) {
       documentHash,
       ipfsCID,
     });
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error(error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    return NextResponse.json({ error: getErrorMessage(error) }, { status: 500 });
   }
 }

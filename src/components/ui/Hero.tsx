@@ -2,6 +2,7 @@
 
 import { motion } from 'framer-motion';
 import { 
+  ArrowRight, 
   Shield, 
   FileCheck2, 
   Cpu, 
@@ -14,7 +15,7 @@ import {
   MapPin, 
   PhoneCall 
 } from 'lucide-react';
-import { AnimatedTransitionLink } from '@/components/ui/AnimatedTransitionLink';
+import Link from 'next/link';
 
 export function Hero() {
   return (
@@ -57,23 +58,23 @@ export function Hero() {
               transition={{ delay: 0.2 }}
               className="flex flex-col sm:flex-row gap-6 justify-center max-w-2xl mx-auto"
             >
-              <AnimatedTransitionLink
+              <Link 
                 href="/verify-public"
                 className="flex-1 flex flex-col items-center justify-center p-6 bg-white border-2 border-emerald-500 hover:bg-emerald-50 text-slate-900 rounded-2xl transition-all shadow-sm hover:shadow-md group cursor-pointer"
               >
                 <FileCheck2 className="w-8 h-8 text-emerald-500 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="font-bold text-lg">Cek Keaslian Dokumen</span>
                 <span className="text-sm text-slate-500 mt-1">Gratis, Tanpa Login (Untuk Publik)</span>
-              </AnimatedTransitionLink>
+              </Link>
 
-              <AnimatedTransitionLink
+              <Link 
                 href="/login"
                 className="flex-1 flex flex-col items-center justify-center p-6 bg-slate-900 hover:bg-slate-800 text-white border-2 border-slate-900 rounded-2xl transition-all shadow-lg shadow-slate-900/20 group cursor-pointer"
               >
                 <Award className="w-8 h-8 text-amber-400 mb-2 group-hover:scale-110 transition-transform" />
                 <span className="font-bold text-lg">Portal Audit Finansial</span>
                 <span className="text-sm text-slate-300 mt-1">Penerbitan via Lisk L2 (KAP / Bank)</span>
-              </AnimatedTransitionLink>
+              </Link>
             </motion.div>
           </div>
 
@@ -266,12 +267,12 @@ export function Hero() {
                   </li>
                 </ul>
               </div>
-              <AnimatedTransitionLink
+              <Link 
                 href="/login"
                 className="mt-8 block w-full text-center py-3 bg-slate-100 hover:bg-slate-200 text-slate-900 font-bold rounded-xl transition-all text-sm cursor-pointer"
               >
                 Mulai Gratis
-              </AnimatedTransitionLink>
+              </Link>
             </div>
 
             {/* Pro Plan */}
@@ -301,16 +302,16 @@ export function Hero() {
                   </li>
                   <li className="flex items-center gap-2.5 text-xs text-slate-300">
                     <Check className="w-4 h-4 text-amber-400 shrink-0" />
-                    Notifikasi Pembayaran Midtrans
+                    Registrasi Otomatis ke Blockchain
                   </li>
                 </ul>
               </div>
-              <AnimatedTransitionLink
+              <Link 
                 href="/login"
                 className="mt-8 block w-full text-center py-3 bg-gradient-to-r from-amber-500 to-yellow-500 text-slate-950 font-bold rounded-xl hover:from-amber-600 hover:to-yellow-600 transition-all text-sm cursor-pointer shadow-lg shadow-amber-500/20"
               >
                 Langganan Pro
-              </AnimatedTransitionLink>
+              </Link>
             </div>
 
             {/* Enterprise Plan */}

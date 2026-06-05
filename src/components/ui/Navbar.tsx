@@ -3,7 +3,6 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { Menu, X } from 'lucide-react';
-import { AnimatedTransitionLink } from '@/components/ui/AnimatedTransitionLink';
 
 export function Navbar() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
@@ -39,9 +38,9 @@ export function Navbar() {
             <Link href="/#about" className="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">
               About
             </Link>
-            <AnimatedTransitionLink href={isLoggedIn ? "/dashboard" : "/login"} className="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">
+            <Link href={isLoggedIn ? "/dashboard" : "/login"} className="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">
               Profile
-            </AnimatedTransitionLink>
+            </Link>
             <Link href="/#pricing" className="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors">
               Pricing
             </Link>
@@ -58,12 +57,12 @@ export function Navbar() {
             <div className="hidden md:flex items-center gap-3">
               {isLoggedIn ? (
                 <>
-                  <AnimatedTransitionLink
+                  <Link
                     href="/dashboard"
                     className="inline-flex items-center justify-center px-4 py-2 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all border border-amber-200"
                   >
                     Dashboard
-                  </AnimatedTransitionLink>
+                  </Link>
                   <button
                     onClick={async () => {
                       await fetch('/api/auth/logout', { method: 'POST' });
@@ -75,12 +74,12 @@ export function Navbar() {
                   </button>
                 </>
               ) : (
-                <AnimatedTransitionLink
+                <Link
                   href="/login"
                   className="inline-flex items-center justify-center px-5 py-2 text-sm font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 rounded-xl transition-all shadow-md shadow-amber-600/10 active:scale-[0.98]"
                 >
                   Register & Login
-                </AnimatedTransitionLink>
+                </Link>
               )}
             </div>
 
@@ -106,13 +105,13 @@ export function Navbar() {
             >
               About
             </Link>
-            <AnimatedTransitionLink
+            <Link 
               href={isLoggedIn ? "/dashboard" : "/login"} 
               onClick={() => setMobileMenuOpen(false)}
               className="text-sm font-medium text-slate-600 hover:text-amber-600 transition-colors py-1"
             >
               Profile
-            </AnimatedTransitionLink>
+            </Link>
             <Link 
               href="/#pricing" 
               onClick={() => setMobileMenuOpen(false)}
@@ -139,13 +138,13 @@ export function Navbar() {
           <div className="pt-4 border-t border-gray-100 flex flex-col gap-2">
             {isLoggedIn ? (
               <>
-                <AnimatedTransitionLink
+                <Link
                   href="/dashboard"
                   onClick={() => setMobileMenuOpen(false)}
                   className="w-full text-center py-2.5 text-sm font-medium text-amber-700 bg-amber-50 hover:bg-amber-100 rounded-xl transition-all border border-amber-200"
                 >
                   Dashboard
-                </AnimatedTransitionLink>
+                </Link>
                 <button
                   onClick={async () => {
                     await fetch('/api/auth/logout', { method: 'POST' });
@@ -158,13 +157,13 @@ export function Navbar() {
                 </button>
               </>
             ) : (
-              <AnimatedTransitionLink
+              <Link
                 href="/login"
                 onClick={() => setMobileMenuOpen(false)}
                 className="w-full text-center py-2.5 text-sm font-semibold text-white bg-gradient-to-r from-amber-600 to-amber-700 hover:from-amber-700 hover:to-amber-800 rounded-xl transition-all shadow-md shadow-amber-600/10 active:scale-[0.98]"
               >
                 Register & Login
-              </AnimatedTransitionLink>
+              </Link>
             )}
           </div>
         </div>

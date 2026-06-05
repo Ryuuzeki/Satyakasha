@@ -16,7 +16,7 @@ export function VerificationStepper({ currentStep }: { currentStep: number }) {
   const steps: Step[] = [
     { id: 1, label: 'Menganalisis anomali biometrik/deepfake...', description: 'Memeriksa integritas gambar menggunakan AI model', status: currentStep > 1 ? 'completed' : currentStep === 1 ? 'loading' : 'pending' },
     { id: 2, label: 'Mengamankan data ke IPFS...', description: 'Mengunggah file ke decentralized storage', status: currentStep > 2 ? 'completed' : currentStep === 2 ? 'loading' : 'pending' },
-    { id: 3, label: 'Mencatat ke Lisk Blockchain...', description: 'Menunggu konfirmasi transaksi L2 wallet', status: currentStep > 3 ? 'completed' : currentStep === 3 ? 'loading' : 'pending' },
+    { id: 3, label: 'Mencatat ke Lisk Blockchain...', description: 'Kuota dikurangi, dokumen dicatat ke blockchain', status: currentStep > 3 ? 'completed' : currentStep === 3 ? 'loading' : 'pending' },
   ];
 
   return (

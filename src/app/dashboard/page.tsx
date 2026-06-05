@@ -8,6 +8,67 @@ import { VerificationStepper } from '@/components/ui/VerificationStepper';
 import { ReceiptCard } from '@/components/ui/ReceiptCard';
 import { motion, AnimatePresence } from 'framer-motion';
 
+type ApiErrorPayload = {
+  error?: string;
+  details?: string;
+};
+
+type VerifyResponse = ApiErrorPayload & {
+  status: 'success';
+  documentHash: string;
+  ipfsCID: string;
+};
+
+type RegisterResponse = ApiErrorPayload & {
+  status: 'registered';
+  hash: string;
+  cid: string;
+  txHash: string;
+  remainingCredits: number;
+};
+
+const DASHBOARD_UPLOAD_LIMIT_MB = 4;
+
+function getErrorMessage(error: unknown) {
+  return error instanceof Error ? error.message : String(error);
+}
+
+async function readJsonResponse<T extends ApiErrorPayload>(
+  response: Response,
+  label: string,
+): Promise<T> {
+  const contentType = response.headers.get('content-type') || '';
+
+  if (!contentType.includes('application/json')) {
+    const text = await response.text();
+    console.error(`${label} returned non-JSON response:`, text);
+
+    if (response.status === 413 || text.includes('FUNCTION_PAYLOAD_TOO_LARGE')) {
+      throw new Error(
+        `${label}: ukuran file melebihi batas server. Maksimal ${DASHBOARD_UPLOAD_LIMIT_MB}MB untuk upload dashboard.`,
+      );
+    }
+
+    throw new Error(
+      `${label}: server mengembalikan respons tidak valid (${response.status}). Coba deploy ulang atau cek log Vercel.`,
+    );
+  }
+
+  let data: T;
+  try {
+    data = await response.json();
+  } catch (error) {
+    console.error(`${label} returned invalid JSON:`, error);
+    throw new Error(`${label}: respons server tidak bisa dibaca.`);
+  }
+
+  if (!response.ok) {
+    throw new Error(data.error || `${label} gagal (${response.status}).`);
+  }
+
+  return data;
+}
+
 export default function Dashboard() {
   const router = useRouter();
   const [mounted, setMounted] = useState(false);
@@ -16,7 +77,7 @@ export default function Dashboard() {
   const [institutionName, setInstitutionName] = useState<string | null>(null);
   const [plan, setPlan] = useState<'Starter' | 'Pro' | 'Enterprise'>('Starter');
   const [credits, setCredits] = useState<number>(0);
-  const [step, setStep] = useState(0); // 0=Upload, 1=Analyzing, 2=IPFS, 3=Processing, 4=Done
+  const [step, setStep] = useState(0); // 0=Upload, 1=Analyzing, 2=IPFS, 3=Registering, 4=Done
   const [receiptData, setReceiptData] = useState<{ hash: string; cid: string; txHash: string } | null>(null);
 
   useEffect(() => {
@@ -52,6 +113,12 @@ export default function Dashboard() {
       return;
     }
 
+    // Cek kuota di sisi client sebelum upload
+    if (credits <= 0) {
+      alert("Kuota dokumen Anda telah habis. Silakan upgrade paket untuk melanjutkan.");
+      return;
+    }
+
     setFile(selectedFile);
     setStep(1); // Start AI analysis
     
@@ -65,21 +132,12 @@ export default function Dashboard() {
         body: formData,
       });
 
-      const contentType = res.headers.get("content-type");
-      if (!contentType || !contentType.includes("application/json")) {
-        const textData = await res.text();
-        console.error("Server returned non-JSON response:", textData);
-        throw new Error(`Server Error (${res.status}): Terjadi kesalahan atau ukuran file terlalu besar.`);
-      }
-
-      const data = await res.json();
+      const data = await readJsonResponse<VerifyResponse>(res, 'Verifikasi dokumen');
       
-      if (!res.ok) throw new Error(data.error || 'Verifikasi Gagal');
+      setStep(3); // Mendaftarkan ke blockchain
       
-      setStep(3); // Menunggu pembayaran
-      
-      // Minta Snap Token ke API Checkout
-      const checkoutRes = await fetch('/api/checkout', {
+      // Langsung daftarkan dokumen & kurangi kuota (tanpa pembayaran)
+      const registerRes = await fetch('/api/register', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
@@ -87,65 +145,25 @@ export default function Dashboard() {
         body: JSON.stringify({
           documentHash: data.documentHash,
           ipfsCID: data.ipfsCID,
-          institutionName: institutionName,
-          recipientName: recipientName
+          recipientName: recipientName,
         })
       });
 
-      const checkoutContentType = checkoutRes.headers.get("content-type");
-      if (!checkoutContentType || !checkoutContentType.includes("application/json")) {
-        const checkoutTextError = await checkoutRes.text();
-        console.error("Non-JSON response from /api/checkout:", checkoutTextError);
-        throw new Error(`Checkout Error (${checkoutRes.status}): Terjadi kesalahan tak terduga pada server pembayaran.`);
-      }
+      const registerData = await readJsonResponse<RegisterResponse>(registerRes, 'Registrasi dokumen');
 
-      const checkoutData = await checkoutRes.json();
-      if (!checkoutRes.ok) throw new Error(checkoutData.error || 'Gagal memulai checkout');
+      // Update sisa kuota di UI
+      setCredits(registerData.remainingCredits);
 
-      // Handle Mock Mode for testing without real Midtrans account
-      if (checkoutData.isMock) {
-        console.warn("Mock Payment Success triggered");
-        setTimeout(() => {
-          setReceiptData({
-            hash: data.documentHash,
-            cid: data.ipfsCID,
-            txHash: checkoutData.order_id + "-mock-paid",
-          });
-          setStep(4);
-        }, 1500);
-        return;
-      }
-
-      // Tampilkan Midtrans Snap Popup
-      (window as any).snap.pay(checkoutData.token, {
-        onSuccess: function(result: any){
-          // Pembayaran berhasil, trigger polling atau tampilkan sukses sementara relayer bekerja
-          console.log("Pembayaran Sukses", result);
-          setReceiptData({
-            hash: data.documentHash,
-            cid: data.ipfsCID,
-            txHash: result.order_id + "-paid", // TX sebenarnya akan di-generate oleh relayer backend
-          });
-          setStep(4);
-        },
-        onPending: function(result: any){
-          console.log("Menunggu pembayaran", result);
-          alert("Pembayaran Anda sedang diproses.");
-        },
-        onError: function(result: any){
-          console.log("Pembayaran Gagal", result);
-          alert("Pembayaran gagal. Silakan coba lagi.");
-          setStep(0);
-        },
-        onClose: function(){
-          console.log("Pelanggan menutup popup tanpa menyelesaikan pembayaran");
-          setStep(0);
-        }
+      setReceiptData({
+        hash: registerData.hash,
+        cid: registerData.cid,
+        txHash: registerData.txHash,
       });
+      setStep(4);
 
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error(error);
-      alert(error.message || 'Terjadi kesalahan saat memproses dokumen.');
+      alert(getErrorMessage(error) || 'Terjadi kesalahan saat memproses dokumen.');
       setStep(0);
     }
   };
@@ -208,7 +226,7 @@ export default function Dashboard() {
                         className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 outline-none transition-all bg-white shadow-sm"
                       />
                     </div>
-                    <FileUpload onFileSelect={handleFileSelect} />
+                    <FileUpload onFileSelect={handleFileSelect} maxSizeMb={DASHBOARD_UPLOAD_LIMIT_MB} />
                   </motion.div>
                 ) : (
                   <motion.div
@@ -249,7 +267,7 @@ export default function Dashboard() {
                   <div className="text-center">
                     <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
                     <p className="text-blue-900 font-medium">
-                      {step === 3 ? "Menunggu Pembayaran Midtrans..." : "Memproses Dokumen..."}
+                      {step === 3 ? "Mendaftarkan ke Blockchain..." : "Memproses Dokumen..."}
                     </p>
                     <p className="text-sm text-blue-600/70 mt-1">Mohon jangan tinggalkan halaman ini</p>
                   </div>

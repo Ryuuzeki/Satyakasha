@@ -58,7 +58,19 @@ export const provider = new ethers.JsonRpcProvider(
  * - The Pino logger automatically redacts any field containing 'privateKey'
  * - Keep minimal balance in this wallet (~100 tx worth of gas)
  */
-export const relayerWallet = new ethers.Wallet(env.RELAYER_PRIVATE_KEY, provider);
+let tempWallet: ethers.Wallet;
+try {
+  const key = env.RELAYER_PRIVATE_KEY.startsWith('0x') ? env.RELAYER_PRIVATE_KEY : `0x${env.RELAYER_PRIVATE_KEY}`;
+  tempWallet = new ethers.Wallet(key, provider);
+} catch (error) {
+  blockchainLogger.warn(
+    'RELAYER_PRIVATE_KEY is invalid or using placeholder. Generating a random wallet fallback for development/testing.'
+  );
+  const randomWallet = ethers.Wallet.createRandom(provider);
+  tempWallet = new ethers.Wallet(randomWallet.privateKey, provider);
+}
+
+export const relayerWallet = tempWallet;
 
 blockchainLogger.info(
   { relayerAddress: relayerWallet.address },
